@@ -8,6 +8,7 @@ from YoutubeApi.responses import response_200
 api_key = 'AIzaSyDEtBuQVc_M71w5odpUzKC2TAnGZGoDF3A'
 channel_ids = ['UCtXgBWNjyHrH2e-IbtIqDdQ']
 playlist_id = 'PLEGyvPj66Tepi7iGf5NNVilCHnWyZabzq'
+video_ids = ["z4Cxn1lDPXo", "NeSpx7vZifc", "khq8q5V3vzM"]
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 
@@ -49,11 +50,34 @@ def get_channel_detail(request):
 def get_video_ids(request):
     request = youtube.playlistItems().list(part='contentDetails',
                                            playlistId=playlist_id,
-                                           # max_result=50
+                                           maxResults=50
                                            )
     response = request.execute()
     video_ids = []
     for i in range(len(response['items'])):
         video_ids.append(response['items'][i]['contentDetails']['videoId'])
+    next_page_token = response.get('nextPageToken')
+    more_pages = True
+    while more_pages:
+        if next_page_token is None:
+            more_pages = False
+        else:
+            request = youtube.playlistItems().list(part='contentDetails',
+                                                   playlistId=playlist_id,
+                                                   maxResults=50,
+                                                   pageToken=next_page_token)
+            response = request.execute()
+            for i in range(len(response['items'])):
+                video_ids.append(response['items'][i]['contentDetails']['videoId'])
+            next_page_token = response.get('nextPageToken')
 
     return response_200(data=video_ids)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_video_details(request):
+    request = youtube.videos().list(part='snippet,statistics',
+                                    id=','.join(video_ids))
+    response = request.execute()
+    return response_200(data=response)
