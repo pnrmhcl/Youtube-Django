@@ -16,4 +16,10 @@ def get_channel_stats(request):
     request = youtube.channels().list(
         part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
-    return response_200(data=response)
+    data = dict(Channel_name=response['items'][0]['snippet']['title'],
+                Subscribers=response['items'][0]['statistics']['subscriberCount'],
+                Views=response['items'][0]['statistics']['viewCount'],
+                Total_videos=response['items'][0]['statistics']['viewCount']
+
+                )
+    return response_200(data=data)
