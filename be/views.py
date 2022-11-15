@@ -48,6 +48,12 @@ def get_channel_detail(request):
 @permission_classes([AllowAny])
 def get_video_ids(request):
     request = youtube.playlistItems().list(part='contentDetails',
-                                           playlistId=playlist_id)
+                                           playlistId=playlist_id,
+                                           # max_result=50
+                                           )
     response = request.execute()
-    return response_200(data=response)
+    video_ids = []
+    for i in range(len(response['items'])):
+        video_ids.append(response['items'][i]['contentDetails']['videoId'])
+
+    return response_200(data=video_ids)
