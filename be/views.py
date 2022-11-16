@@ -1,4 +1,5 @@
 import pandas as pd
+import requests
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from googleapiclient.discovery import build
@@ -94,3 +95,33 @@ def get_video_details(request):
                                )
             all_video_stats.append(video_stats)
     return response_200(data=all_video_stats)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_comments(request):
+    all_data = []
+    request1 = youtube.commentThreads().list(
+        part="snippet",
+        videoId="kEgJBxPpPzw",
+        maxResults=100
+    ).execute()
+    while True:
+
+        data = request2 = youtube.commentThreads().list(
+            part="snippet",
+            videoId="NeSpx7vZifc",
+            maxResults=100,
+
+            textFormat="plainText"
+        ).execute()
+
+        for item in data["items"]:
+            comment = item["snippet"]["topLevelComment"]
+            comment_data = dict(
+                comment=item["snippet"]["topLevelComment"],
+                author=comment["snippet"]["authorDisplayName"],
+                text=comment["snippet"]["textDisplay"])
+            all_data.append(comment_data)
+
+        return response_200(data=all_data)
