@@ -77,7 +77,20 @@ def get_video_ids(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_video_details(request):
-    request = youtube.videos().list(part='snippet,statistics',
-                                    id=','.join(video_ids))
-    response = request.execute()
-    return response_200(data=response)
+    all_video_stats = []
+    for i in range(0, len(video_ids), 50):
+        request = youtube.videos().list(
+            part='snippet,statistics',
+            id=','.join(video_ids[i:i + 50]))
+
+        response = request.execute()
+
+        for video in response['items']:
+            video_stats = dict(Title=video['snippet']['title'],
+                               Published_date=video['snippet']['publishedAt'],
+                               Views=video['statistics']['viewCount'],
+                               Likes=video['statistics']['likeCount'],
+                               Comments=video['statistics']['commentCount']
+                               )
+            all_video_stats.append(video_stats)
+    return response_200(data=all_video_stats)
