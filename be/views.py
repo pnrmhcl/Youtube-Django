@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from YoutubeApi.responses import response_200
 
 api_key = 'AIzaSyDEtBuQVc_M71w5odpUzKC2TAnGZGoDF3A'
-channel_ids = ['UCtXgBWNjyHrH2e-IbtIqDdQ']
+
 playlist_id = 'PLEGyvPj66Tepi7iGf5NNVilCHnWyZabzq'
 video_ids = ["z4Cxn1lDPXo", "NeSpx7vZifc", "khq8q5V3vzM"]
 youtube = build('youtube', 'v3', developerKey=api_key)
@@ -15,26 +15,42 @@ youtube = build('youtube', 'v3', developerKey=api_key)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_channel_stats(request):
+def get_channels_stats(request):
+    channel_id = request.data['channelId']
     all_data = []
-    request = youtube.channels().list(
-        part='snippet,contentDetails,statistics', id=','.join(channel_ids))
+    request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
     for i in range(len(response['items'])):
-        data = dict(Channel_name=response['items'][i]['snippet']['title'],
-                    Subscribers=response['items'][i]['statistics']['subscriberCount'],
-                    Views=response['items'][i]['statistics']['viewCount'],
-                    Total_videos=response['items'][i]['statistics']['viewCount'])
+        data = dict(
+            channelName=response['items'][i]['snippet']['title'],
+            viewCount=response['items'][i]['statistics']["viewCount"],
+            subscriberCount=response['items'][i]['statistics']["subscriberCount"],
+            videoCount=response['items'][i]['statistics']["videoCount"])
         all_data.append(data)
     return response_200(data=all_data)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_single_channel(request):
+    channel_id = request.data['channelId']
+    request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
+    response = request.execute()
+    data = dict(
+        channelName=response['items'][0]['snippet']['title'],
+        viewCount=response['items'][0]['statistics']['viewCount'],
+        subscriberCount=response['items'][0]['statistics']['subscriberCount'],
+        videoCount=response['items'][0]['statistics']['videoCount'])
+    return response_200(data=data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_channel_detail(request):
+    channel_id = request.data['channelId']
     all_data = []
     request = youtube.channels().list(
-        part='snippet,contentDetails,statistics', id=','.join(channel_ids))
+        part='snippet,contentDetails,statistics', id=','.join(channel_id))
     response = request.execute()
     for i in range(len(response['items'])):
         data = dict(Channel_name=response['items'][i]['snippet']['title'],
