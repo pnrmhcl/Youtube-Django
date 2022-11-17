@@ -125,3 +125,14 @@ def get_comments(request):
             all_data.append(comment_data)
 
         return response_200(data=all_data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_subscriber(request):
+    request = youtube.subscriptions().list(
+        part="snippet,contentDetails",
+        channelId="UCt5USYpzzMCYhkirVQGHwKQ"
+    )
+    response = request.execute()
+    return response_200(data=response)
