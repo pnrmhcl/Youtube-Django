@@ -3,14 +3,12 @@ from rest_framework.permissions import AllowAny
 from googleapiclient.discovery import build
 from YoutubeApi.responses import response_200
 
-api_key = 'AIzaSyDEtBuQVc_M71w5odpUzKC2TAnGZGoDF3A'
-
-youtube = build('youtube', 'v3', developerKey=api_key)
-
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channels_stats(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
     all_data = []
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
@@ -28,6 +26,8 @@ def get_channels_stats(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_single_channel(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
@@ -42,6 +42,8 @@ def get_single_channel(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channel_detail(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
@@ -57,6 +59,8 @@ def get_channel_detail(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channel_photo(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
@@ -67,6 +71,8 @@ def get_channel_photo(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_playlist_video_id(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     playlist_id = request.data['playlistId']
     request = youtube.playlistItems().list(part='contentDetails', playlistId=playlist_id)
     response = request.execute()
@@ -91,6 +97,8 @@ def get_playlist_video_id(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_video_details(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     video_ids = request.data['videoId']
     all_video_stats = []
     for i in range(0, len(video_ids), 50):
@@ -101,13 +109,14 @@ def get_video_details(request):
             video_stats["statistics"] = video['statistics']
             video_stats["snippet"] = video['snippet']
             all_video_stats.append(video_stats)
-
     return response_200(data=all_video_stats)
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_video_comments(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     video_id = request.data['videoId']
     all_data = []
     request1 = youtube.commentThreads().list(part="snippet", videoId=video_id, maxResults=100).execute()
@@ -127,6 +136,8 @@ def get_video_comments(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_subscriber(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
     all_data = []
     request = youtube.subscriptions().list(part="snippet", channelId=channel_id)
