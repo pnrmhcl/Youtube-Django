@@ -4,7 +4,6 @@ from googleapiclient.discovery import build
 from YoutubeApi.responses import response_200
 
 api_key = 'AIzaSyDEtBuQVc_M71w5odpUzKC2TAnGZGoDF3A'
-playlist_id = 'PLEGyvPj66Tepi7iGf5NNVilCHnWyZabzq'
 video_ids = ["z4Cxn1lDPXo", "NeSpx7vZifc", "khq8q5V3vzM"]
 youtube = build('youtube', 'v3', developerKey=api_key)
 
@@ -67,23 +66,24 @@ def get_channel_photo(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_video_ids(request):
-    request = youtube.playlistItems().list(part='contentDetails', playlistId=playlist_id, maxResults=50)
+def get_playlist_video_id(request):
+    playlist_id = request.data['playlistId']
+    request = youtube.playlistItems().list(part='contentDetails', playlistId=playlist_id)
     response = request.execute()
     video_ids = []
     for i in range(len(response['items'])):
-        video_ids.append(response['items'][i]['contentDetails']['videoId'])
+        video_ids.append(response['items'][i]['contentDetails'])
     next_page_token = response.get('nextPageToken')
     more_pages = True
     while more_pages:
         if next_page_token is None:
             more_pages = False
         else:
-            request = youtube.playlistItems().list(part='contentDetails', playlistId=playlist_id, maxResults=50,
+            request = youtube.playlistItems().list(part='contentDetails', playlistId=playlist_id,
                                                    pageToken=next_page_token)
             response = request.execute()
             for i in range(len(response['items'])):
-                video_ids.append(response['items'][i]['contentDetails']['videoId'])
+                video_ids.append(response['items'][i]['contentDetails'])
             next_page_token = response.get('nextPageToken')
     return response_200(data=video_ids)
 
