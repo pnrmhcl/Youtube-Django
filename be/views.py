@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 from YoutubeApi.responses import response_200
 
 api_key = 'AIzaSyDEtBuQVc_M71w5odpUzKC2TAnGZGoDF3A'
-video_ids = ["z4Cxn1lDPXo", "NeSpx7vZifc", "khq8q5V3vzM"]
+
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 
@@ -91,15 +91,14 @@ def get_playlist_video_id(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_video_details(request):
+    video_ids = request.data['videoId']
     all_video_stats = []
     for i in range(0, len(video_ids), 50):
         request = youtube.videos().list(part='snippet,statistics', id=','.join(video_ids[i:i + 50]))
         response = request.execute()
         for video in response['items']:
-            video_stats = dict(Title=video['snippet']['title'], Published_date=video['snippet']['publishedAt'],
-                               Views=video['statistics']['viewCount'], Likes=video['statistics']['likeCount'],
-                               Comments=video['statistics']['commentCount'])
-            all_video_stats.append(video_stats)
+            statistics_and_snippet = dict(video['statistics']), dict(video['snippet'])
+            all_video_stats.append(statistics_and_snippet)
     return response_200(data=all_video_stats)
 
 
