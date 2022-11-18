@@ -33,7 +33,8 @@ def get_single_channel(request):
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
     data = dict(
-        channelName=response['items'][0]['snippet']['title'], viewCount=response['items'][0]['statistics']['viewCount'],
+        channelName=response['items'][0]['snippet']['title'],
+        viewCount=response['items'][0]['statistics']['viewCount'],
         subscriberCount=response['items'][0]['statistics']['subscriberCount'],
         videoCount=response['items'][0]['statistics']['videoCount'])
     return response_200(data=data)
@@ -43,18 +44,25 @@ def get_single_channel(request):
 @permission_classes([AllowAny])
 def get_channel_detail(request):
     channel_id = request.data['channelId']
-    all_data = []
-    request = youtube.channels().list(
-        part='snippet,contentDetails,statistics', id=','.join(channel_id))
+    request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
-    for i in range(len(response['items'])):
-        data = dict(Channel_name=response['items'][i]['snippet']['title'],
-                    Subscribers=response['items'][i]['statistics']['subscriberCount'],
-                    Views=response['items'][i]['statistics']['viewCount'],
-                    Total_videos=response['items'][i]['statistics']['viewCount'],
-                    playlist_id=response['items'][i]['contentDetails']['relatedPlaylists']['uploads'])
-        all_data.append(data)
-    return response_200(data=all_data)
+    data = dict(
+        snippet=response['items'][0]['snippet'],
+        totalView=response['items'][0]['statistics']['viewCount'],
+        totalVideo=response['items'][0]['statistics']['videoCount'],
+        subscriberCount=response['items'][0]['statistics']['subscriberCount']
+    )
+    return response_200(data=data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_channel_photo(request):
+    channel_id = request.data['channelId']
+    request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
+    response = request.execute()
+    data = dict(response['items'][0]["snippet"]["thumbnails"])
+    return response_200(data=data)
 
 
 @api_view(['GET'])
