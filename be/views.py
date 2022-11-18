@@ -104,11 +104,12 @@ def get_video_details(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_comments(request):
+def get_video_comments(request):
+    video_id = request.data['videoId']
     all_data = []
-    request1 = youtube.commentThreads().list(part="snippet", videoId="kEgJBxPpPzw", maxResults=100).execute()
+    request1 = youtube.commentThreads().list(part="snippet", videoId=video_id, maxResults=100).execute()
     while True:
-        data = request2 = youtube.commentThreads().list(part="snippet", videoId="NeSpx7vZifc", maxResults=100,
+        data = request2 = youtube.commentThreads().list(part="snippet", videoId=video_id, maxResults=100,
                                                         textFormat="plainText").execute()
         for item in data["items"]:
             comment = item["snippet"]["topLevelComment"]
