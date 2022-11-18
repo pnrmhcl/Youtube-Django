@@ -102,7 +102,7 @@ def get_video_details(request):
     return response_200(data=all_video_stats)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_video_comments(request):
     video_id = request.data['videoId']
@@ -121,11 +121,10 @@ def get_video_comments(request):
         return response_200(data=all_data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_subscriber(request):
-    request = youtube.subscriptions().list(
-        part="snippet,contentDetails",
-        channelId="UCt5USYpzzMCYhkirVQGHwKQ")
+    channel_id = request.data['channelId']
+    request = youtube.subscriptions().list(part="snippet", channelId=channel_id)
     response = request.execute()
     return response_200(data=response)
