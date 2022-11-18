@@ -51,8 +51,7 @@ def get_channel_detail(request):
         snippet=response['items'][0]['snippet'],
         totalView=response['items'][0]['statistics']['viewCount'],
         totalVideo=response['items'][0]['statistics']['videoCount'],
-        subscriberCount=response['items'][0]['statistics']['subscriberCount']
-    )
+        subscriberCount=response['items'][0]['statistics']['subscriberCount'])
     return response_200(data=data)
 
 
@@ -137,8 +136,8 @@ def get_video_comments(request):
 @permission_classes([AllowAny])
 def get_subscriber(request):
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
+    youtube = build('youtube', 'v3', developerKey=api_key)
     all_data = []
     request = youtube.subscriptions().list(part="snippet", channelId=channel_id)
     response = request.execute()
@@ -146,3 +145,13 @@ def get_subscriber(request):
         comment_data = item["snippet"]
         all_data.append(comment_data)
     return response_200(data=all_data)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def video_category(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.videoCategories().list(part='snippet', regionCode='IN')
+    response = request.execute()
+    return response_200(data=response)
