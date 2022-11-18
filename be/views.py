@@ -125,6 +125,10 @@ def get_video_comments(request):
 @permission_classes([AllowAny])
 def get_subscriber(request):
     channel_id = request.data['channelId']
+    all_data = []
     request = youtube.subscriptions().list(part="snippet", channelId=channel_id)
     response = request.execute()
-    return response_200(data=response)
+    for item in response["items"]:
+        comment_data = item["snippet"]
+        all_data.append(comment_data)
+    return response_200(data=all_data)
