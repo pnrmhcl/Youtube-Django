@@ -8,7 +8,7 @@ api_key = 'AIzaSyDEtBuQVc_M71w5odpUzKC2TAnGZGoDF3A'
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channels_stats(request):
     channel_id = request.data['channelId']
@@ -25,7 +25,7 @@ def get_channels_stats(request):
     return response_200(data=all_data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_single_channel(request):
     channel_id = request.data['channelId']
@@ -39,7 +39,7 @@ def get_single_channel(request):
     return response_200(data=data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channel_detail(request):
     channel_id = request.data['channelId']
@@ -54,7 +54,7 @@ def get_channel_detail(request):
     return response_200(data=data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channel_photo(request):
     channel_id = request.data['channelId']
@@ -64,7 +64,7 @@ def get_channel_photo(request):
     return response_200(data=data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_playlist_video_id(request):
     playlist_id = request.data['playlistId']
@@ -88,7 +88,7 @@ def get_playlist_video_id(request):
     return response_200(data=video_ids)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_video_details(request):
     video_ids = request.data['videoId']
