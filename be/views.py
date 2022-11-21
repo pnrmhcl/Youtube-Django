@@ -266,7 +266,7 @@ def i18n_language(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def channel_banners(request):
-    should_contain_key_values = ["apiKey", "channelId"]
+    should_contain_key_values = ["apiKey", "channelId", "file"]
     if not is_request_valid(request.data, should_contain_key_values):
         return response_400()
     api_key = request.data['apiKey']
@@ -279,6 +279,22 @@ def channel_banners(request):
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.channelBanners().insert(
         media_body=str(image_obj.file), channelId=channel_id
+    )
+    response = request.execute()
+    return response_200(data=response)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def search_list(request):
+    should_contain_key_values = ["apiKey"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
+    api_key = request.data['apiKey']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.search().list(
+        part="snippet"
     )
     response = request.execute()
     return response_200(data=response)
