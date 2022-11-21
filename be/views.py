@@ -1,15 +1,21 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from googleapiclient.discovery import build
-from YoutubeApi.responses import response_200
+
+from YoutubeApi.exception import is_request_valid
+from YoutubeApi.responses import response_200, response_400
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channels_stats(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
+    
+    youtube = build('youtube', 'v3', developerKey=api_key)
     all_data = []
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
@@ -26,9 +32,13 @@ def get_channels_stats(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_single_channel(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
     data = dict(
@@ -42,9 +52,13 @@ def get_single_channel(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channel_detail(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
     data = dict(
@@ -58,9 +72,13 @@ def get_channel_detail(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_channel_photo(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     channel_id = request.data['channelId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
     response = request.execute()
     data = dict(response['items'][0]["snippet"]["thumbnails"])
@@ -70,9 +88,13 @@ def get_channel_photo(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_playlist_video_id(request):
+    should_contain_key_values = ["apiKey", "playlistId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     playlist_id = request.data['playlistId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.playlistItems().list(part='contentDetails', playlistId=playlist_id)
     response = request.execute()
     video_ids = []
@@ -96,9 +118,13 @@ def get_playlist_video_id(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_video_details(request):
+    should_contain_key_values = ["apiKey", "videoId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     video_ids = request.data['videoId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
     all_video_stats = []
     for i in range(0, len(video_ids), 50):
         request = youtube.videos().list(part='snippet,statistics', id=','.join(video_ids[i:i + 50]))
@@ -114,9 +140,13 @@ def get_video_details(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_video_comments(request):
+    should_contain_key_values = ["apiKey", "videoId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
-    youtube = build('youtube', 'v3', developerKey=api_key)
     video_id = request.data['videoId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
     all_data = []
     request1 = youtube.commentThreads().list(part="snippet", videoId=video_id, maxResults=100).execute()
     while True:
@@ -135,8 +165,12 @@ def get_video_comments(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_subscriber(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
     channel_id = request.data['channelId']
+
     youtube = build('youtube', 'v3', developerKey=api_key)
     all_data = []
     request = youtube.subscriptions().list(part="snippet", channelId=channel_id)
@@ -150,7 +184,11 @@ def get_subscriber(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def video_category(request):
+    should_contain_key_values = ["apiKey"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
+
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.videoCategories().list(part='snippet', regionCode='IN')
     response = request.execute()
@@ -160,11 +198,14 @@ def video_category(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def most_popular_video_details(request):
+    should_contain_key_values = ["apiKey"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
     api_key = request.data['apiKey']
+
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.videos().list(
         part="id, snippet, contentDetails, statistics",
         chart='mostPopular', regionCode='IN')
     response = request.execute()
     return response_200(data=response)
-
