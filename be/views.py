@@ -214,7 +214,7 @@ def most_popular_video_details(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def caption_list(request):
-    should_contain_key_values = ["apiKey"]
+    should_contain_key_values = ["apiKey", 'videoId']
     if not is_request_valid(request.data, should_contain_key_values):
         return response_400()
     api_key = request.data['apiKey']
@@ -223,6 +223,23 @@ def caption_list(request):
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.captions().list(
         part="id,snippet", videoId=video_id
+    )
+    response = request.execute()
+    return response_200(data=response)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def channel_section(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
+    api_key = request.data['apiKey']
+    channel_id = request.data['channelId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.channelSections().list(
+        part="contentDetails,id,snippet", channelId=channel_id
     )
     response = request.execute()
     return response_200(data=response)
