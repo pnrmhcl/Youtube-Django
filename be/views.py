@@ -14,7 +14,7 @@ def get_channels_stats(request):
         return response_400()
     api_key = request.data['apiKey']
     channel_id = request.data['channelId']
-    
+
     youtube = build('youtube', 'v3', developerKey=api_key)
     all_data = []
     request = youtube.channels().list(part='snippet,contentDetails,statistics', id=channel_id)
@@ -207,5 +207,22 @@ def most_popular_video_details(request):
     request = youtube.videos().list(
         part="id, snippet, contentDetails, statistics",
         chart='mostPopular', regionCode='IN')
+    response = request.execute()
+    return response_200(data=response)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def caption_list(request):
+    should_contain_key_values = ["apiKey"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
+    api_key = request.data['apiKey']
+    video_id = request.data['videoId']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.captions().list(
+        part="id,snippet", videoId=video_id
+    )
     response = request.execute()
     return response_200(data=response)
