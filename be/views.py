@@ -243,3 +243,19 @@ def channel_section(request):
     )
     response = request.execute()
     return response_200(data=response)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def i18n_language(request):
+    should_contain_key_values = ["apiKey"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
+    api_key = request.data['apiKey']
+
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.i18nLanguages().list(
+        part="snippet"
+    )
+    response = request.execute()
+    return response_200(data=response)
