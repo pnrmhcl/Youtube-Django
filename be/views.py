@@ -155,3 +155,16 @@ def video_category(request):
     request = youtube.videoCategories().list(part='snippet', regionCode='IN')
     response = request.execute()
     return response_200(data=response)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def most_popular_video_details(request):
+    api_key = request.data['apiKey']
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.videos().list(
+        part="id, snippet, contentDetails, statistics",
+        chart='mostPopular', regionCode='IN')
+    response = request.execute()
+    return response_200(data=response)
+
