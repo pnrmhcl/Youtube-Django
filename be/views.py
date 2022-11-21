@@ -1,9 +1,11 @@
+from googleapiclient.http import MediaFileUpload
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from googleapiclient.discovery import build
 
 from YoutubeApi.exception import is_request_valid
 from YoutubeApi.responses import response_200, response_400
+from be.models import ChannelImage
 
 
 @api_view(['POST'])
@@ -256,6 +258,27 @@ def i18n_language(request):
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.i18nLanguages().list(
         part="snippet"
+    )
+    response = request.execute()
+    return response_200(data=response)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def channel_banners(request):
+    should_contain_key_values = ["apiKey", "channelId"]
+    if not is_request_valid(request.data, should_contain_key_values):
+        return response_400()
+    api_key = request.data['apiKey']
+    channel_id = request.data['channelId']
+    file = request.data['file']
+    image_obj = ChannelImage.objects.create(
+        file=file,
+        channel_id=channel_id
+    )
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    request = youtube.channelBanners().insert(
+        media_body=str(image_obj.file), channelId=channel_id
     )
     response = request.execute()
     return response_200(data=response)
